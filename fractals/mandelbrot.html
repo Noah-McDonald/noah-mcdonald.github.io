@@ -1,180 +1,28 @@
-class Complex {
-	constructor(real, imag) {
-		this.real = real;
-		this.imag = imag;
-	}
-	square() {
-		// (a+bi)^2 = a^2 - b^2 +2abi
-		let temp_real = this.real;
-		let temp_imag = this.imag;
-		return new Complex(
-			temp_real ** 2 - temp_imag ** 2,	// new real is a^2 - b^2
-			2 * temp_real * temp_imag			// new imag is 2 * a * b
-		);
-	}
-	add(z) {
-		return new Complex(this.real + z.real, this.imag + z.imag);
-	}
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Mandelbrot Viewer</title>
 
-function inMandelbrot(x, y) {
-	c = new Complex(x, y);
-	z = new Complex(0, 0);
-	escaped = false;
+</head>
+<body>
 
-	for (let i = 0; i < DEPTH; i++) {
-		if (z.real ** 2 + z.imag ** 2 > 4) { // sqrt(a^2+b^2) < 2  => a^2+b^2 < 4
-			return false;
-		}
-		z = z.square().add(c);
-	}
-	return true;
-}
+<canvas id="myCanvas" width="800" height="500"></canvas>
 
-function complexToCanvas(z) {
-    let x = ((z.real - RE_START) / (RE_END - RE_START)) * canvas.width;
-    let y = ((IM_END - z.imag) / (IM_END - IM_START)) * canvas.height;
-    return { x, y };
-}
+<div class="controls">
+	<button id="zoomIn">Zoom In</button>
+	<button id="zoomOut">Zoom Out</button>
+	<button id="reset">Reset</button>
 
-function canvasToComplex(x, y) {
-    let real = RE_START + (x / canvas.width) * (RE_END - RE_START);
-    let imag = IM_END - (y / canvas.height) * (IM_END - IM_START);
-    return new Complex(real, imag);
-}
+	<label>Resolution</label>
+	<input type="range" id="resolutionSlider" min="50" max="400" value="200">
+	<span id="resolutionValue">200</span>
 
-function sampleSet() {
-	ctx.clearRect(0, 0, canvas.width, canvas.height);
+	<label>Depth</label>
+	<input type="range" id="depthSlider" min="20" max="300" value="100">
+	<span id="depthValue">100</span>
+</div>
 
-	const stepX = (RE_END - RE_START) / RESOLUTION;
-	const stepY = (IM_END - IM_START) / RESOLUTION;
-
-	const circleRadius = Math.max(1, canvas.width / RESOLUTION / 2);
-
-	for (let j = 0; j <= RESOLUTION; j++) {
-		const y = IM_START + j * stepY;
-		for (let i = 0; i <= RESOLUTION; i++) {
-			const x = RE_START + i * stepX;
-			let z = new Complex(x, y);
-
-			// escape-time algorithm
-			let iter = 0;
-			let curr = new Complex(0, 0);
-			for (; iter < DEPTH; iter++) {
-				if (curr.real ** 2 + curr.imag ** 2 > 4) break;
-				curr = curr.square().add(z);
-			}
-
-			// Standard Mandelbrot coloring
-			if (iter === DEPTH) {
-				ctx.fillStyle = "black";
-			} else {
-				const band = iter % 16;
-				const hue = Math.floor((band / 16) * 360);
-				ctx.fillStyle = `hsl(${hue}, 100%, 50%)`;
-			}
-
-			let canvas_z = complexToCanvas(z);
-			ctx.beginPath();
-			ctx.arc(canvas_z.x, canvas_z.y, circleRadius, 0, 2 * Math.PI);  // radius scales with resolution
-			ctx.fill();
-		}
-	}
-}
-
-/* ---------------- CONFIG ---------------- */
-
-let RE_START = -2;  	// min real
-let RE_END   = 1;   	// max real
-let IM_START = -1;  	// min imaginary
-let IM_END   = 1;   	// max imaginary
-
-let RESOLUTION = 500;
-let DEPTH = 100;		// Z -> Z^2 + C happens DEPTH times
-
-const canvas = document.getElementById("myCanvas");
-const ctx = canvas.getContext("2d");
-
-/* ---------------- ZOOM ---------------- */
-
-// click to zoom
-canvas.addEventListener("click", (e) => {
-	const rect = canvas.getBoundingClientRect();
-	const x = e.clientX - rect.left;
-	const y = e.clientY - rect.top;
-
-	const center = canvasToComplex(x, y);
-
-	const zoomFactor = 0.5;
-	const width = (RE_END - RE_START) * zoomFactor;
-	const height = (IM_END - IM_START) * zoomFactor;
-	
-	RE_START = center.real - width / 2;
-	RE_END   = center.real + width / 2;
-	IM_START = center.imag - height / 2;
-	IM_END   = center.imag + height / 2;
-
-	sampleSet();
-});
-
-/* ---------------- START ---------------- */
-
-sampleSet();
-
-// UI controls
-const resolutionSlider = document.getElementById("resolutionSlider");
-const depthSlider = document.getElementById("depthSlider");
-const resolutionValue = document.getElementById("resolutionValue");
-const depthValue = document.getElementById("depthValue");
-
-const zoomInBtn = document.getElementById("zoomIn");
-const zoomOutBtn = document.getElementById("zoomOut");
-const resetBtn = document.getElementById("reset");
-
-// Update resolution
-resolutionSlider.addEventListener("input", () => {
-	RESOLUTION = parseInt(resolutionSlider.value);
-	resolutionValue.textContent = RESOLUTION;
-	sampleSet();
-});
-
-// Update depth
-depthSlider.addEventListener("input", () => {
-	DEPTH = parseInt(depthSlider.value);
-	depthValue.textContent = DEPTH;
-	sampleSet();
-});
-
-// Zoom helpers
-function zoomAtCenter(factor) {
-	const centerReal = (RE_START + RE_END) / 2;
-	const centerImag = (IM_START + IM_END) / 2;
-
-	const width = (RE_END - RE_START) * factor;
-	const height = (IM_END - IM_START) * factor;
-
-	RE_START = centerReal - width / 2;
-	RE_END   = centerReal + width / 2;
-	IM_START = centerImag - height / 2;
-	IM_END   = centerImag + height / 2;
-
-	sampleSet();
-}
-
-// Buttons
-zoomInBtn.onclick = () => zoomAtCenter(0.5);
-zoomOutBtn.onclick = () => zoomAtCenter(2);
-resetBtn.onclick = () => {
-	RE_START = -2;
-	RE_END = 1;
-	IM_START = -1;
-	IM_END = 1;
-	sampleSet();
-};
-
-// Mouse wheel zoom
-canvas.addEventListener("wheel", (e) => {
-	e.preventDefault();
-	const zoomFactor = e.deltaY < 0 ? 0.8 : 1.25;
-	zoomAtCenter(zoomFactor);
-});
+<script src="script.js"></script>
+</body>
+</html>
