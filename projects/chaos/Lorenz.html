@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Lorenz Attractor - Three.js</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+    }
+    canvas {
+      display: block;
+    }
+  </style>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "./three.module.js"
+    }
+  }
+  </script>
+</head>
+
+<body>
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from './OrbitControls.js';
+
+    let MODE;
+    const params = new URLSearchParams(window.location.search);
+    const mode = params.get("mode");
+
+    if (mode === null) {
+      MODE = "points";
+    } else {
+      MODE = mode;
+    }
+    console.log("MODE:", MODE);
+
+
+    // SCENE SETUP
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.z = 50;
+
+    camera.position.set(-0.000, -50.000, 0.000);
+    camera.lookAt(new THREE.Vector3(-0.000, -49.000, 0.000));
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+
+  // LORENZ ATTRACTOR PARAMETERS
+    const sigma = 10, rho = 28, beta = 8 / 3;
+    const dt = 0.005;
+    let x = 0.1, y = 0, z = 0;
+
+  // SIMULATE THE LORENZ SYSTEM
+    const points = [];
+    for (let i = 0; i < 10000; i++) {
+      const dx = sigma * (y - x) * dt;
+      const dy = (x * (rho - z) - y) * dt;
+      const dz = (x * y - beta * z) * dt;
+      x += dx; y += dy; z += dz;
+      points.push(new THREE.Vector3(x+5, y, z - 20));
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      renderer.render(scene, camera);
+    }
+
+    if (MODE === "lines") {
+      const geometry = new THREE.BufferGeometry().setFromPoints(points);
+      const pointsMaterial = new THREE.PointsMaterial({ color: 0xff0000, size: 0.1 });
+
+      // Connect points with lines
+      const lineMaterial = new THREE.LineBasicMaterial({
+        color: 0xffffff
+      });
+      const lorenzLine = new THREE.Line(geometry, lineMaterial);
+      scene.add(lorenzLine);
+
+      animate();
+
+    } else if (MODE === "points") {
+
+      const geometry = new THREE.BufferGeometry().setFromPoints(points);
+      const material = new THREE.PointsMaterial({ color: 0xff0000, size: 0.1 });
+      const lorenzPoints = new THREE.Points(geometry, material);
+      scene.add(lorenzPoints);
+
+      animate();
+    }
+    // Handle window resize
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
+</body>
+
+</html>

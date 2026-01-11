@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Lorenz Attractor - Three.js</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+    }
+
+    canvas {
+      display: block;
+    }
+  </style>
+
+  <!-- Import map to resolve bare module specifiers -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "./three.module.js"
+    }
+  }
+  </script>
+</head>
+
+<body>
+  <script type="module">
+    // Import Three.js using the import map
+    import * as THREE from 'three';
+    import { OrbitControls } from './OrbitControls.js';
+
+    let MODE;
+    const params = new URLSearchParams(window.location.search);
+    const mode = params.get("mode");
+
+    if (mode === null) {
+      MODE = "lines";
+    } else {
+      MODE = mode;
+    }
+    console.log("MODE:", MODE);
+
+
+    // Scene setup 
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+    camera.position.set(-1.129, -2.380, 2.791);
+    camera.lookAt(new THREE.Vector3(-0.812, -1.700, 2.131));
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+
+    // Halvorsen attractor parameters 
+    const dt = 0.01;
+    let x = -1.48, y = -1.51, z = 2.04;
+    const a = 1.89
+
+    const points = [];
+    for (let i = 0; i < 70000; i++) {
+      const dx = (-a * x - 4 * y - 4 * z - y * y) * dt;
+      const dy = (-a * y - 4 * z - 4 * x - z * z) * dt;
+      const dz = (-a * z - 4 * x - 4 * y - x * x) * dt;
+
+
+      x += dx;
+      y += dy;
+      z += dz;
+      if (i === 2) { console.log(x, y, z); }
+      points.push(new THREE.Vector3(x, y, z));
+    }
+
+
+
+    function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      renderer.render(scene, camera);
+    }
+
+    if (MODE === "lines") {
+      // Create geometry from points
+      const geometry = new THREE.BufferGeometry().setFromPoints(points);
+      const pointsMaterial = new THREE.PointsMaterial({ color: 0xff0000, size: 0.1 });
+
+      // Connect points with lines
+      const lineMaterial = new THREE.LineBasicMaterial({
+        color: 0xffffff,
+        transparent: true,
+        opacity: 0.1
+      });
+      const lorenzLines = new THREE.Line(geometry, lineMaterial);
+      scene.add(lorenzLines);
+
+      animate();
+
+    } else if (MODE === "points") {
+
+      const geometry = new THREE.BufferGeometry().setFromPoints(points);
+
+      const material = new THREE.PointsMaterial({
+        color: 0xff0000,    // red
+        size: 0.1,
+        transparent: true,  // enable transparency
+        opacity: 1
+      });
+
+      const lorenzPoints = new THREE.Points(geometry, material);
+      scene.add(lorenzPoints);
+
+      animate();
+    }
+    // Handle window resize
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
+</body>
+
+</html>
