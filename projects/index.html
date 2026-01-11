@@ -12,26 +12,27 @@
 
   <base href="/">
   <style>
-      html, body {
-          height: 100%;
-          margin: 0;
-      }
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+    }
 
-      body {
-          display: grid;
-          grid-template-rows: auto 1fr auto;
-      }
-      .mandelbrot {
-          display: flex;
-          align-items: flex-start;
-          gap: 1rem;
-      }
+    body {
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+    }
 
-      .mandelbrot img {
-          width: 230px;
-          height: auto;
-      }
+    .mandelbrot {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+    }
 
+    .mandelbrot img {
+      width: 230px;
+      height: auto;
+    }
   </style>
 
 
@@ -39,61 +40,79 @@
 </head>
 
 <body>
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">Mathematical Notes</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" aria-current="page" href="index.html">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link disabled" href="javascript:void(0)">Notes</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="./projects/index.html">Projects</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link disabled" href="javascript:void(0)">About</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
   <div class="container-fluid">
-    <a class="navbar-brand" href="#">Mathematical Notes</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ms-auto">
-        <li class="nav-item">
-          <a class="nav-link" aria-current="page" href="index.html">Home</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link disabled" href="javascript:void(0)">Notes</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link active" href="./projects/index.html">Projects</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link disabled" href="javascript:void(0)">About</a>
-        </li>
-      </ul>
+    <div class="container py-3">
+      <main>
+        <div class="mt-4 p-5 bg-primary text-white rounded">
+          <section class="mt-4">
+            <h1>Projects list</h1>
+            <p>A list of all of my web projects. To see other (python) projects and their source code check out my <a
+                href="https://github.com/Noah-McDonald" class="link-light">GitHub</a>.</p>
+          </section>
+        </div>
+
+        <section class="mt-4 mandelbrot">
+          <img src="../src/mandelbrot.png" alt="An image of the Mandelbrot set">
+          <div>
+            <h2>Mandelbrot and its siblings.</h2>
+            <p>
+              A simple js-based program that lets you explore what happens when you change \( z_{n+1} = z_n^2 + c \)
+              something else.
+            </p>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal"
+              onclick="window.open('./projects/mandelbrot.html', '_blank')">
+              Open mandelbrot explorer
+            </button>
+          </div>
+        </section>
+
+        <section class="mt-4 mandelbrot">
+          <img src="../src/mandelbrot.png" alt="An image of the Mandelbrot set">
+          <div>
+            <h2>Strange attractors and chaotic systems.</h2>
+            <p>
+              A 3d plots of many strange attractors in WebGL with Three.js.
+            </p>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal"
+              onclick="window.open('./projects/mandelbrot.html', '_blank')">
+              Open mandelbrot explorer
+            </button>
+          </div>
+        </section>
+
+      </main>
     </div>
   </div>
-</nav>
-
-<div class="container-fluid">
-  <div class="container py-3">
-    <main>
-      <div class="mt-4 p-5 bg-primary text-white rounded">
-        <section class="mt-4">
-          <h1>Projects list</h1>
-          <p>A list of all of my web projects. To see other (python) projects and their source code check out my <a href="https://github.com/Noah-McDonald" class="link-light">GitHub</a>.</p>
-        </section>
-      </div>
-
-      <section class="mt-4 mandelbrot">
-        <img src="../src/mandelbrot.png" alt="An image of the Mandelbrot set">
-        <div>
-          <h2>Mandelbrot and its siblings.</h2>
-          <p>
-            A simple js-based program that lets you explore what happens when you change \( z_{n+1} = z_n^2 + c \) something else.
-          </p>
-          <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" onclick="window.open('./projects/mandelbrot.html', '_blank')">
-            Open mandelbrot explorer
-          </button>
-        </div>
-      </section>
-    </main>
-  </div>
-</div>
-<footer class="bg-dark text-white text-center py-3 mt-5">
-  <p class="mb-0">© 2025 Noah McDonald. All content is my own work.
-  </p>
-</footer>
+  <footer class="bg-dark text-white text-center py-3 mt-5">
+    <p class="mb-0">© 2025 Noah McDonald. All content is my own work.
+    </p>
+  </footer>
 
 </body>
 
